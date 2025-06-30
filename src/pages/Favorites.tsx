@@ -84,7 +84,7 @@ const Favorites: React.FC = () => {
 
       {/* Loading state */}
       {isLoading && (
-        <div className="py-12">
+        <div className="loading-section-container">
           <Loading.Section text="Loading your favorites..." variant="dots" />
         </div>
       )}
@@ -108,9 +108,9 @@ const Favorites: React.FC = () => {
               />
               <Card.Footer>
                 <div className="badge-container">
-                  <div className="flex items-center">
-                    <HeartIcon className="h-4 w-4 text-red-500 mr-1" />
-                    <span className="text-xs text-gray-600">Favorite</span>
+                  <div className="favorite-icon-container">
+                    <HeartIcon className="favorite-icon" />
+                    <span className="favorite-text">Favorite</span>
                   </div>
                   <span className="detail-view-label">View details</span>
                 </div>
@@ -132,7 +132,7 @@ const Favorites: React.FC = () => {
             <Button
               variant="primary"
               onClick={() => window.location.href = '/'}
-              icon={<ArrowRightIcon className="h-4 w-4" />}
+              icon={<ArrowRightIcon className="icon-small" />}
             >
               Explore Cats
             </Button>

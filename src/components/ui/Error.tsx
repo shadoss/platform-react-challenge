@@ -258,7 +258,7 @@ Error.Toast = function ErrorToast({
               onClick={onClose}
             >
               <span className="sr-only">Close</span>
-              <XCircleIcon className="h-5 w-5" aria-hidden="true" />
+              <XCircleIcon className="error-close-icon" aria-hidden="true" />
             </button>
           </div>
         )}

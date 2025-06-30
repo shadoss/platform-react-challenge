@@ -388,6 +388,10 @@
   @apply rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
 }
 
+.modal-close-icon {
+  @apply h-5 w-5;
+}
+
 .modal-content-with-title {
   @apply px-6 py-5;
 }
@@ -579,6 +583,10 @@
 
 .error-toast-close-button {
   @apply inline-flex rounded-md text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2;
+}
+
+.error-close-icon {
+  @apply h-5 w-5;
 }
 
 /* Loading */

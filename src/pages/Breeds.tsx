@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getBreeds } from '../api/catService';
 import type { CatBreed } from '../api/catService';
-import { Loading, Error, Card } from '../components/ui';
+import { Loading, Error, Card, Button } from '../components/ui';
 import { BreedModal } from '../components';
 
 /**
@@ -101,12 +101,12 @@ const Breeds: React.FC = () => {
           <h3 className="empty-state-title">No breeds found</h3>
           <p className="empty-state-message">Try refreshing the page or check back later.</p>
           <div className="empty-state-actions">
-            <button
+            <Button
+              variant="primary"
               onClick={() => refetch()}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
               Refresh
-            </button>
+            </Button>
           </div>
         </div>
       )}

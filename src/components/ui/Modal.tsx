@@ -84,7 +84,7 @@ const Modal: React.FC<ModalProps> = ({
                         onClick={onClose}
                       >
                         <span className="sr-only">Close</span>
-                        <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                        <XMarkIcon className="modal-close-icon" aria-hidden="true" />
                       </button>
                     )}
                   </div>

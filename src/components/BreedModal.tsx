@@ -109,7 +109,7 @@ const BreedModal: React.FC<BreedModalProps> = ({
               )}
 
               {hasMore && (
-                <div className="mt-6 text-center">
+                <div className="modal-button-container">
                   <Button
                     onClick={handleLoadMore}
                     isLoading={status === 'loading' && images.length > 0}

@@ -154,7 +154,7 @@ const RandomCats: React.FC = () => {
             isLoading={isLoading && cats.length > 0}
             disabled={isLoading}
             icon={!isLoading ? <ArrowPathIcon className="icon-small" /> : undefined}
-            className="px-8"
+            className="wide-button"
           >
             {isLoading ? 'Loading...' : 'Load More Cats'}
           </Button>
