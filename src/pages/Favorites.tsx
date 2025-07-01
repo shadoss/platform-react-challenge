@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getFavorites, getCatImage } from '../api/catService';
-import type { CatImage as CatImageType } from '../api/catService';
+import type { CatImage as CatImageType } from '../types';
 import { Button, Loading, Error, Card } from '../components/ui';
 import { CatImageModal } from '../components';
 import { HeartIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
@@ -42,7 +42,7 @@ const Favorites: React.FC = () => {
     isError: isErrorSelectedImage,
   } = useQuery({
     queryKey: ['catImage', selectedImageId],
-    queryFn: () => (selectedImageId ? getCatImage(selectedImageId) : null),
+    queryFn: () => (selectedImageId ? getCatImage(selectedImageId) : undefined),
     enabled: !!selectedImageId,
   });
 
@@ -107,13 +107,7 @@ const Favorites: React.FC = () => {
                 className="card-image-fixed-height"
               />
               <Card.Footer>
-                <div className="badge-container">
-                  <div className="favorite-icon-container">
-                    <HeartIcon className="favorite-icon" />
-                    <span className="favorite-text">Favorite</span>
-                  </div>
                   <span className="detail-view-label">View details</span>
-                </div>
               </Card.Footer>
             </Card>
           ))}
@@ -140,29 +134,17 @@ const Favorites: React.FC = () => {
         </div>
       )}
 
-      {/* Cat image modal with favorite ID for removal */}
-      {selectedImage && (
+      {/* Cat image modal - show whenever selectedImageId is set */}
+      {selectedImageId && (
         <CatImageModal
-          isOpen={!!selectedImage}
+          isOpen={!!selectedImageId}
           onClose={handleCloseModal}
           image={selectedImage}
           favoriteId={selectedFavoriteId || undefined}
           onFavoriteRemoved={handleFavoriteRemoved}
-        />
-      )}
-
-      {/* Loading state for selected image */}
-      {isLoadingSelectedImage && selectedImageId && (
-        <Loading.Overlay text="Loading cat details..." blur={true} />
-      )}
-
-      {/* Error state for selected image */}
-      {isErrorSelectedImage && selectedImageId && (
-        <Error.FullPage
-          title="Failed to load cat details"
-          message="We couldn't load the details for this cat. Please try again."
-          onRetry={() => setSelectedImageId(selectedImageId)}
-          variant="error"
+          isLoading={isLoadingSelectedImage}
+          isError={isErrorSelectedImage}
+          errorMessage={`We couldn't load the details for this cat. The image ID "${selectedImageId}" might be invalid or the server is unavailable.`}
         />
       )}
     </div>

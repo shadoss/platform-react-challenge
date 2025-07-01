@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Loading, Error } from './ui';
 import { getCatsByBreed } from '../api/catService';
-import type { CatBreed, CatImage as CatImageType } from '../api/catService';
+import type { CatBreed, CatImage as CatImageType } from '../types';
 import CatImage from './CatImage';
 import CatImageModal from './CatImageModal';
 import useApiStatus from '../hooks/useApiStatus';

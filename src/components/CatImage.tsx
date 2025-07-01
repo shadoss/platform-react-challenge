@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card } from './ui';
-import type { CatImage as CatImageType } from '../api/catService';
+import type { CatImage as CatImageType } from '../types';
 
 interface CatImageProps {
   image: CatImageType;

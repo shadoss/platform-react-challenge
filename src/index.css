@@ -1,8 +1,8 @@
 @import "tailwindcss";
 @import "tailwindcss/preflight";
 
-@tailwind base;
-@tailwind components;
+/*@tailwind base;*/
+/*@tailwind components;*/
 @tailwind utilities;
 
 :root {
@@ -721,19 +721,6 @@
 
 .icon-small {
   @apply h-4 w-4;
-}
-
-/* GitHub Link */
-.github-link-container {
-  @apply hidden md:flex items-center;
-}
-
-.github-link {
-  @apply text-gray-500 hover:text-gray-700 ml-4;
-}
-
-.github-icon {
-  @apply h-6 w-6;
 }
 
 /* Header Actions */

@@ -1,9 +1,5 @@
 import { useState, useCallback } from 'react';
-
-/**
- * Status types for API requests
- */
-export type ApiStatus = 'idle' | 'loading' | 'success' | 'error';
+import type { ApiStatus } from '../types';
 
 /**
  * Hook for managing API request status

@@ -1,25 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-/**
- * Interface for a favorite cat image
- */
-interface FavoriteCat {
-  id: string;
-  url: string;
-  breedId?: string;
-  breedName?: string;
-}
-
-/**
- * Interface for the favorites store state
- */
-interface FavoritesState {
-  favorites: FavoriteCat[];
-  addFavorite: (cat: FavoriteCat) => void;
-  removeFavorite: (id: string) => void;
-  isFavorite: (id: string) => boolean;
-}
+import type { FavoritesState } from '../types';
 
 /**
  * Create a Zustand store for managing favorite cats

@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { Modal, Button, Error } from './ui';
+import { Modal, Button, Error, Loading } from './ui';
 import { addFavorite, removeFavorite } from '../api/catService';
-import type { CatImage as CatImageType } from '../api/catService';
+import type { CatImage as CatImageType } from '../types';
 import useFavoriteStore from '../store/favoriteStore';
 
 interface CatImageModalProps {
   isOpen: boolean;
   onClose: () => void;
-  image: CatImageType;
+  image?: CatImageType;
   favoriteId?: number;
   onFavoriteRemoved?: () => void;
+  isLoading?: boolean;
+  isError?: boolean;
+  errorMessage?: string;
 }
 
 /**
@@ -23,25 +26,30 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
   image,
   favoriteId,
   onFavoriteRemoved,
+  isLoading = false,
+  isError = false,
+  errorMessage = "We couldn't load the details for this cat. Please try again.",
 }) => {
   const [isAddingFavorite, setIsAddingFavorite] = useState(false);
   const [isRemovingFavorite, setIsRemovingFavorite] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Get the first breed if available
-  const breed = image.breeds && image.breeds.length > 0 ? image.breeds[0] : null;
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Access the favorite store
   const { addFavorite: addToStore, removeFavorite: removeFromStore, isFavorite } = useFavoriteStore();
 
-  // Check if the image is already a favorite
-  const isImageFavorite = favoriteId !== undefined || isFavorite(image.id);
+  // Get the first breed if available (only if image exists)
+  const breed = image?.breeds && image.breeds.length > 0 ? image.breeds[0] : null;
+
+  // Check if the image is already a favorite (only if image exists)
+  const isImageFavorite = favoriteId !== undefined || (image && isFavorite(image.id));
 
   // Handle adding to favorites
   const handleAddFavorite = async () => {
+    if (!image) return;
+
     try {
       setIsAddingFavorite(true);
-      setError(null);
+      setActionError(null);
 
       // Call the API to add to favorites
       await addFavorite(image.id);
@@ -57,18 +65,18 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       setIsAddingFavorite(false);
     } catch (err) {
       setIsAddingFavorite(false);
-      setError('Failed to add to favorites. Please try again.');
+      setActionError('Failed to add to favorites. Please try again.');
       console.error('Error adding to favorites:', err);
     }
   };
 
   // Handle removing from favorites
   const handleRemoveFavorite = async () => {
-    if (favoriteId === undefined) return;
+    if (favoriteId === undefined || !image) return;
 
     try {
       setIsRemovingFavorite(true);
-      setError(null);
+      setActionError(null);
 
       // Call the API to remove from favorites
       await removeFavorite(favoriteId);
@@ -84,104 +92,128 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       }
     } catch (err) {
       setIsRemovingFavorite(false);
-      setError('Failed to remove from favorites. Please try again.');
+      setActionError('Failed to remove from favorites. Please try again.');
       console.error('Error removing from favorites:', err);
     }
   };
+
+  // Determine the modal title based on state and data
+  const modalTitle = isError ? 'Error Loading Cat' : (breed ? `${breed.name}` : 'Cat Image');
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={breed ? `${breed.name}` : 'Cat Image'}
+      title={modalTitle}
       maxWidth="2xl"
     >
-      <div className="modal-content-layout">
-        {/* Image */}
-        <div className="modal-column">
-          <div className="image-container">
-            <img
-              src={image.url}
-              alt={breed ? `Cat of breed ${breed.name}` : 'Cat image'}
-              className="responsive-image"
-            />
-          </div>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="py-12 text-center">
+          <Loading variant="dots" text="Loading cat details..." />
         </div>
+      )}
 
-        {/* Details */}
-        <div className="modal-column">
-          {/* Breed information if available */}
-          {breed ? (
-            <div className="mb-6">
-              <h4 className="section-heading">About {breed.name}</h4>
-              <p className="section-description">{breed.description}</p>
+      {/* Error state */}
+      {isError && !isLoading && (
+        <div className="py-8 text-center">
+          <Error
+            title="Failed to load cat details"
+            message={errorMessage}
+            variant="error"
+            className="mb-6"
+          />
+        </div>
+      )}
 
-              <div className="details-grid">
-                <div>
-                  <span className="font-medium">Origin:</span> {breed.origin}
+      {/* Content state - only show when we have an image and no errors/loading */}
+      {!isLoading && !isError && image && (
+        <div className="modal-content-layout">
+          {/* Image */}
+          <div className="modal-column">
+            <div className="image-container">
+              <img
+                src={image.url}
+                alt={breed ? `Cat of breed ${breed.name}` : 'Cat image'}
+                className="responsive-image"
+              />
+            </div>
+          </div>
+
+          {/* Details */}
+          <div className="modal-column">
+            {/* Breed information if available */}
+            {breed ? (
+              <div className="mb-6">
+                <h4 className="section-heading">About {breed.name}</h4>
+                <p className="section-description">{breed.description}</p>
+
+                <div className="details-grid">
+                  <div>
+                    <span className="font-medium">Origin:</span> {breed.origin}
+                  </div>
+                  <div>
+                    <span className="font-medium">Life Span:</span> {breed.life_span} years
+                  </div>
+                  <div>
+                    <span className="font-medium">Temperament:</span> {breed.temperament}
+                  </div>
+                  <div>
+                    <span className="font-medium">Weight:</span> {breed.weight.metric} kg
+                  </div>
                 </div>
-                <div>
-                  <span className="font-medium">Life Span:</span> {breed.life_span} years
-                </div>
-                <div>
-                  <span className="font-medium">Temperament:</span> {breed.temperament}
-                </div>
-                <div>
-                  <span className="font-medium">Weight:</span> {breed.weight.metric} kg
-                </div>
+
+                {breed.wikipedia_url && (
+                  <a
+                    href={breed.wikipedia_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-with-icon"
+                  >
+                    Learn more on Wikipedia
+                    <svg className="link-icon" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </a>
+                )}
               </div>
+            ) : (
+              <p className="empty-state-text">No breed information available for this cat.</p>
+            )}
 
-              {breed.wikipedia_url && (
-                <a
-                  href={breed.wikipedia_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="link-with-icon"
+            {/* Favorite actions */}
+            <div className="mt-4">
+              {actionError && (
+                <div className="mb-4">
+                  <Error message={actionError} />
+                </div>
+              )}
+
+              {isImageFavorite ? (
+                <Button
+                  variant="outline"
+                  onClick={handleRemoveFavorite}
+                  isLoading={isRemovingFavorite}
+                  disabled={isRemovingFavorite || favoriteId === undefined}
+                  className="w-full"
                 >
-                  Learn more on Wikipedia
-                  <svg className="link-icon" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </a>
+                  Remove from Favorites
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  onClick={handleAddFavorite}
+                  isLoading={isAddingFavorite}
+                  disabled={isAddingFavorite}
+                  className="w-full"
+                >
+                  Add to Favorites
+                </Button>
               )}
             </div>
-          ) : (
-            <p className="empty-state-text">No breed information available for this cat.</p>
-          )}
-
-          {/* Favorite actions */}
-          <div className="mt-4">
-
-            {error && (
-              <div className="mb-4">
-                <Error message={error} />
-              </div>
-            )}
-
-            {isImageFavorite ? (
-              <Button
-                variant="outline"
-                onClick={handleRemoveFavorite}
-                isLoading={isRemovingFavorite}
-                disabled={isRemovingFavorite || favoriteId === undefined}
-                className="w-full"
-              >
-                Remove from Favorites
-              </Button>
-            ) : (
-              <Button
-                variant="primary"
-                onClick={handleAddFavorite}
-                isLoading={isAddingFavorite}
-                disabled={isAddingFavorite}
-                className="w-full"
-              >
-                Add to Favorites
-              </Button>
-            )}
           </div>
         </div>
-      </div>
+      )}
     </Modal>
   );
 };

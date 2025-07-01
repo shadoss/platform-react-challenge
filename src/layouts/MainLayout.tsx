@@ -16,7 +16,7 @@ const MainLayout: React.FC = () => {
       <footer className="footer">
         <div className="footer-container">
           <div className="footer-content">
-            <p className="footer-text">© 2023 Cat Lovers App. All rights reserved.</p>
+            <p className="footer-text">© 2025 Cat Lovers App. All rights reserved.</p>
           </div>
         </div>
       </footer>

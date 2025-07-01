@@ -1,33 +1,6 @@
 import apiClient from './apiClient';
 import type { AxiosResponse } from 'axios';
-
-/**
- * Interface for a cat image from the API
- */
-export interface CatImage {
-  id: string;
-  url: string;
-  width: number;
-  height: number;
-  breeds: CatBreed[];
-}
-
-/**
- * Interface for a cat breed from the API
- */
-export interface CatBreed {
-  id: string;
-  name: string;
-  description: string;
-  temperament: string;
-  origin: string;
-  life_span: string;
-  weight: {
-    imperial: string;
-    metric: string;
-  };
-  wikipedia_url?: string;
-}
+import type { CatImage, CatBreed, FavoriteEntry } from '../types';
 
 /**
  * Fetch random cat images
@@ -109,7 +82,7 @@ export const removeFavorite = async (favoriteId: number): Promise<{ message: str
  * Get user's favorite cat images
  * @returns Promise with array of favorite entries
  */
-export const getFavorites = async (): Promise<{ id: number; image_id: string; image: CatImage }[]> => {
-  const response: AxiosResponse<{ id: number; image_id: string; image: CatImage }[]> = await apiClient.get('/favourites');
+export const getFavorites = async (): Promise<FavoriteEntry[]> => {
+  const response: AxiosResponse<FavoriteEntry[]> = await apiClient.get('/favourites');
   return response.data;
 };

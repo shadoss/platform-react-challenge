@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getBreeds } from '../api/catService';
-import type { CatBreed } from '../api/catService';
+import type { CatBreed } from '../types';
 import { Loading, Error, Card, Button } from '../components/ui';
 import { BreedModal } from '../components';
 
