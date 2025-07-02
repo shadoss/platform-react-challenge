@@ -1,6 +1,6 @@
 import React, { useState, useCallback, memo } from 'react';
 import { Modal, Button, Error, Loading } from './ui';
-import { addFavorite, removeFavorite } from '../api/catService';
+import { addFavorite, removeFavorite, getFavorites } from '../api/catService';
 import type { CatImage as CatImageType } from '../types';
 import useFavoriteStore from '../store/favoriteStore';
 import { useQueryClient } from '@tanstack/react-query';
@@ -79,14 +79,27 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
 
   // Handle removing from favorites - memoized with useCallback
   const handleRemoveFavorite = useCallback(async () => {
-    if (favoriteId === undefined || !image) return;
+    if (!image) return;
 
     try {
       setIsRemovingFavorite(true);
       setActionError(null);
 
-      // Call the API to remove from favorites
-      await removeFavorite(favoriteId);
+      // If we have a favoriteId, call the API to remove from favorites
+      if (favoriteId !== undefined) {
+        await removeFavorite(favoriteId);
+      } else {
+        // If we don't have a favoriteId, we need to fetch it from the API
+        const favorites = await getFavorites();
+        const favorite = favorites.find(fav => fav.image_id === image.id);
+
+        if (favorite) {
+          // If we found the favorite, remove it from the API
+          await removeFavorite(favorite.id);
+        } else {
+          console.warn('Could not find favorite ID for image:', image.id);
+        }
+      }
 
       // Remove from local store
       removeFromStore(image.id);
@@ -204,7 +217,7 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
                   variant="outline"
                   onClick={handleRemoveFavorite}
                   isLoading={isRemovingFavorite}
-                  disabled={isRemovingFavorite || favoriteId === undefined}
+                  disabled={isRemovingFavorite}
                   className="w-full"
                 >
                   Remove from Favorites
