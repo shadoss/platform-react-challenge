@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Header } from '../components';
+import { Loading } from '../components/ui';
 
 /**
  * MainLayout component
@@ -11,7 +12,13 @@ const MainLayout: React.FC = () => {
     <div className="app-container">
       <Header />
       <main className="main-content">
-        <Outlet />
+        <Suspense fallback={
+          <div className="loading-section-container">
+            <Loading.Section text="Loading page..." variant="dots" />
+          </div>
+        }>
+          <Outlet />
+        </Suspense>
       </main>
       <footer className="footer">
         <div className="footer-container">

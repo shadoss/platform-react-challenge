@@ -1,11 +1,14 @@
+import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider, isRouteErrorResponse, useRouteError } from 'react-router-dom';
 import MainLayout from './layouts/MainLayout';
-import RandomCats from './pages/RandomCats';
-import Breeds from './pages/Breeds';
-import Favorites from './pages/Favorites';
-import NotFoundPage from './pages/NotFoundPage';
-import NetworkErrorPage from './pages/NetworkErrorPage';
 import { ErrorBoundary } from './components';
+
+// Lazy load page components for better performance
+const RandomCats = lazy(() => import('./pages/RandomCats'));
+const Breeds = lazy(() => import('./pages/Breeds'));
+const Favorites = lazy(() => import('./pages/Favorites'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const NetworkErrorPage = lazy(() => import('./pages/NetworkErrorPage'));
 
 /**
  * App component

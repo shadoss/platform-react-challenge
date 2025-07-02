@@ -1,6 +1,8 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Error } from '../components/ui';
+import { useNavigate, useLocation } from 'react-router-dom';
+import {Button, Error} from '../components/ui';
+import { SEO } from '../components';
+import {HomeIcon} from "@heroicons/react/24/outline";
 
 interface NetworkErrorPageProps {
   message?: string;
@@ -42,19 +44,28 @@ const NetworkErrorPage: React.FC<NetworkErrorPageProps> = ({
   };
 
   return (
-    <Error.FullPage
-      title="Connection Error"
-      message={message}
-      variant="error"
-      onRetry={handleRetry}
-      actions={
-        <Link to="/">
-          <button className="btn-base btn-primary btn-md ml-4">
+    <>
+      <SEO
+        title="Connection Error"
+        description="We're having trouble connecting to our servers. Please check your internet connection and try again."
+        canonicalUrl={window.location.href.split('?')[0]}
+      />
+      <Error.FullPage
+        title="Connection Error"
+        message={message}
+        variant="error"
+        onRetry={handleRetry}
+        actions={
+          <Button
+              variant="primary"
+              onClick={() => window.location.href = '/'}
+              icon={<HomeIcon className="icon-small" />}
+          >
             Go to Home
-          </button>
-        </Link>
-      }
-    />
+          </Button>
+        }
+      />
+    </>
   );
 };
 

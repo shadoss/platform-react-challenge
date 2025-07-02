@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getRandomCats, getCatImage } from '../api/catService';
 import type { CatImage as CatImageType } from '../types';
 import { Button, Loading, Error, Card } from '../components/ui';
-import { CatImageModal } from '../components';
+import { CatImageModal, SEO } from '../components';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 /**
@@ -70,8 +70,34 @@ const RandomCats: React.FC = () => {
     setSearchParams({});
   };
 
+  // Create JSON-LD structured data for the page
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': 'Random Cats | Cat Lovers App',
+    'description': 'Discover adorable cat photos from our collection of random cat images.',
+    'url': window.location.href,
+    'mainEntity': {
+      '@type': 'ItemList',
+      'itemListElement': cats.slice(0, 10).map((cat, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'url': `${window.location.origin}/?imageId=${cat.id}`,
+        'name': cat.breeds && cat.breeds.length > 0 ? `${cat.breeds[0].name} Cat` : 'Cat Image',
+        'image': cat.url
+      }))
+    }
+  };
+
   return (
     <div className="page-container">
+      <SEO
+        title="Random Cats"
+        description="Discover adorable cat photos from our collection of random cat images."
+        canonicalUrl={window.location.href.split('?')[0]}
+        ogImage={cats.length > 0 ? cats[0].url : undefined}
+        jsonLd={jsonLd}
+      />
       <div className="page-header">
         <h1 className="page-title">Random Cats</h1>
         <p className="page-subtitle">Discover adorable cat photos from our collection</p>

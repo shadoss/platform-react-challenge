@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getBreeds } from '../api/catService';
 import type { CatBreed } from '../types';
 import { Loading, Error, Card, Button } from '../components/ui';
-import { BreedModal } from '../components';
+import { BreedModal, SEO } from '../components';
 
 /**
  * Breeds page component
@@ -34,8 +34,37 @@ const Breeds: React.FC = () => {
     setSelectedBreed(null);
   };
 
+  // Create JSON-LD structured data for the page
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    'name': 'Cat Breeds | Cat Lovers App',
+    'description': 'Explore different cat breeds and learn about their characteristics, origins, and temperaments.',
+    'url': window.location.href,
+    'mainEntity': {
+      '@type': 'ItemList',
+      'itemListElement': breeds ? breeds.slice(0, 10).map((breed, index) => ({
+        '@type': 'ListItem',
+        'position': index + 1,
+        'item': {
+          '@type': 'Thing',
+          'name': breed.name,
+          'description': breed.description,
+          'url': `${window.location.origin}/breeds?breed=${breed.id}`
+        }
+      })) : []
+    }
+  };
+
   return (
     <div className="page-container">
+      <SEO
+        title="Cat Breeds"
+        description="Explore different cat breeds and learn about their characteristics, origins, and temperaments."
+        canonicalUrl={window.location.href.split('?')[0]}
+        ogType="article"
+        jsonLd={jsonLd}
+      />
       <div className="page-header">
         <h1 className="page-title">Cat Breeds</h1>
         <p className="page-subtitle">Explore different cat breeds and learn about their characteristics</p>

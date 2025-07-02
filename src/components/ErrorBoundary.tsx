@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
-import { Error } from './ui';
-import { Link } from 'react-router-dom';
+import {Button, Error} from './ui';
+import {HomeIcon} from "@heroicons/react/24/outline";
 
 interface Props {
   children: ReactNode;
@@ -68,11 +68,13 @@ class ErrorBoundary extends Component<Props, State> {
           message="We encountered an unexpected error. Please try again or return to the home page."
           onRetry={this.handleRetry}
           actions={
-            <Link to="/">
-              <button className="btn-base btn-primary btn-md ml-4">
-                Go to Home
-              </button>
-            </Link>
+            <Button
+                variant="primary"
+                onClick={() => window.location.href = '/'}
+                icon={<HomeIcon className="icon-small" />}
+            >
+              Go to Home
+            </Button>
           }
         />
       );

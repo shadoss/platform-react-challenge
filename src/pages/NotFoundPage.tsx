@@ -1,6 +1,7 @@
 import React from 'react';
 import {Button, Error} from '../components/ui';
 import {HomeIcon} from "@heroicons/react/24/outline";
+import { SEO } from '../components';
 
 /**
  * NotFoundPage component
@@ -8,20 +9,27 @@ import {HomeIcon} from "@heroicons/react/24/outline";
  */
 const NotFoundPage: React.FC = () => {
   return (
-    <Error.FullPage
-      title="Page not found"
-      message="The page you're looking for doesn't exist or has been moved."
-      variant="warning"
-      actions={
-          <Button
-              variant="primary"
-              onClick={() => window.location.href = '/'}
-              icon={<HomeIcon className="icon-small" />}
-          >
-              Go to Home
-          </Button>
-      }
-    />
+    <>
+      <SEO
+        title="Page Not Found"
+        description="The page you're looking for doesn't exist or has been moved."
+        canonicalUrl={window.location.href.split('?')[0]}
+      />
+      <Error.FullPage
+        title="Page not found"
+        message="The page you're looking for doesn't exist or has been moved."
+        variant="warning"
+        actions={
+            <Button
+                variant="primary"
+                onClick={() => window.location.href = '/'}
+                icon={<HomeIcon className="icon-small" />}
+            >
+                Go to Home
+            </Button>
+        }
+      />
+    </>
   );
 };
 

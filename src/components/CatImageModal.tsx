@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { Modal, Button, Error, Loading } from './ui';
 import { addFavorite, removeFavorite } from '../api/catService';
 import type { CatImage as CatImageType } from '../types';
 import useFavoriteStore from '../store/favoriteStore';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CatImageModalProps {
   isOpen: boolean;
@@ -37,14 +38,17 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
   // Access the favorite store
   const { addFavorite: addToStore, removeFavorite: removeFromStore, isFavorite } = useFavoriteStore();
 
+  // Access the query client to invalidate queries
+  const queryClient = useQueryClient();
+
   // Get the first breed if available (only if image exists)
   const breed = image?.breeds && image.breeds.length > 0 ? image.breeds[0] : null;
 
   // Check if the image is already a favorite (only if image exists)
   const isImageFavorite = favoriteId !== undefined || (image && isFavorite(image.id));
 
-  // Handle adding to favorites
-  const handleAddFavorite = async () => {
+  // Handle adding to favorites - memoized with useCallback
+  const handleAddFavorite = useCallback(async () => {
     if (!image) return;
 
     try {
@@ -62,16 +66,19 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
         breedName: breed?.name,
       });
 
+      // Invalidate the favorites query to ensure fresh data when navigating to Favorites page
+      await queryClient.invalidateQueries({ queryKey: ['favorites'] });
+
       setIsAddingFavorite(false);
     } catch (err) {
       setIsAddingFavorite(false);
       setActionError('Failed to add to favorites. Please try again.');
       console.error('Error adding to favorites:', err);
     }
-  };
+  }, [image, breed, addToStore, queryClient, setIsAddingFavorite, setActionError]);
 
-  // Handle removing from favorites
-  const handleRemoveFavorite = async () => {
+  // Handle removing from favorites - memoized with useCallback
+  const handleRemoveFavorite = useCallback(async () => {
     if (favoriteId === undefined || !image) return;
 
     try {
@@ -84,6 +91,9 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       // Remove from local store
       removeFromStore(image.id);
 
+      // Invalidate the favorites query to ensure fresh data when navigating to Favorites page
+      await queryClient.invalidateQueries({ queryKey: ['favorites'] });
+
       setIsRemovingFavorite(false);
 
       // Call the onFavoriteRemoved callback if provided
@@ -95,7 +105,7 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       setActionError('Failed to remove from favorites. Please try again.');
       console.error('Error removing from favorites:', err);
     }
-  };
+  }, [favoriteId, image, removeFromStore, queryClient, onFavoriteRemoved, setIsRemovingFavorite, setActionError]);
 
   // Determine the modal title based on state and data
   const modalTitle = isError ? 'Error Loading Cat' : (breed ? `${breed.name}` : 'Cat Image');
@@ -218,4 +228,5 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
   );
 };
 
-export default CatImageModal;
+// Memoize the component to prevent unnecessary re-renders
+export default memo(CatImageModal);
