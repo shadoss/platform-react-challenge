@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface CardProps {
   className?: string;
@@ -22,6 +22,8 @@ interface CardImageProps {
   alt?: string;
   className?: string;
   aspectRatio?: 'auto' | 'square' | 'video' | 'wide';
+  onLoad?: () => void;
+  onError?: () => void;
 }
 
 interface CardContentProps {
@@ -88,19 +90,70 @@ Card.Image = function CardImage({
   src,
   alt = '',
   className = '',
-  aspectRatio = 'auto'
+  aspectRatio = 'auto',
+  onLoad,
+  onError
 }: CardImageProps) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
   // Combined classes using CSS classes from index.css
   const aspectRatioClass = aspectRatio !== 'auto' ? `card-image-aspect-${aspectRatio}` : '';
   const combinedClasses = `card-image ${aspectRatioClass} ${className}`;
 
+  // Handle image load
+  const handleImageLoad = () => {
+    setIsLoading(false);
+    onLoad?.();
+  };
+
+  // Handle image error
+  const handleImageError = () => {
+    setIsLoading(false);
+    setHasError(true);
+    onError?.();
+  };
+
   return (
     <div className={combinedClasses}>
+      {/* Loading state */}
+      {isLoading && (
+        <div className="image-loading-container">
+          <div className="image-loading-spinner"></div>
+        </div>
+      )}
+
+      {/* Error state */}
+      {hasError && (
+        <div className="image-loading-container">
+          <div className="text-center">
+            <svg
+              className="image-error-icon"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            <p className="image-error-text">Failed to load image</p>
+          </div>
+        </div>
+      )}
+
+      {/* Image */}
       <img
         src={src}
         alt={alt}
-        className="card-image-img"
+        className={`card-image-img ${isLoading || hasError ? 'opacity-0' : 'opacity-100'}`}
         loading="lazy"
+        onLoad={handleImageLoad}
+        onError={handleImageError}
       />
     </div>
   );
