@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Loading, Error } from './ui';
-import { getCatsByBreed } from '../api/catService';
 import type { CatBreed, CatImage as CatImageType } from '../types';
 import CatImage from './CatImage';
 import CatImageModal from './CatImageModal';
 import useApiStatus from '../hooks/useApiStatus';
+import { fetchBreedImages, hasMoreImages, updateImageCollection } from '../utils/imageUtils';
 
 interface BreedModalProps {
   isOpen: boolean;
@@ -30,18 +30,23 @@ const BreedModal: React.FC<BreedModalProps> = ({
   // Fetch images for the breed
   const fetchImages = async (pageNum: number, append = false) => {
     try {
-      setLoading();
       const limit = 8;
-      const newImages = await getCatsByBreed(breed.id, limit, pageNum);
 
-      if (append) {
-        setImages(prev => [...prev, ...newImages]);
-      } else {
-        setImages(newImages);
-      }
+      // Use the utility function to fetch breed images
+      const newImages = await fetchBreedImages(
+        breed.id,
+        pageNum,
+        limit,
+        setLoading,
+        setSuccess,
+        setError
+      );
 
-      setHasMore(newImages.length === limit);
-      setSuccess();
+      // Use the utility function to update the image collection
+      setImages(prev => updateImageCollection(prev, newImages, append));
+
+      // Use the utility function to determine if there are more images
+      setHasMore(hasMoreImages(newImages.length, limit));
     } catch (err) {
       console.error('Error fetching breed images:', err);
       setError();

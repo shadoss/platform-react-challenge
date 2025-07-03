@@ -5,6 +5,7 @@ import type { CatImage as CatImageType } from '../types';
 import { Button, Loading, Error, Card } from '../components/ui';
 import { CatImageModal, SEO } from '../components';
 import { HeartIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
+import { createCollectionPageJsonLd } from '../utils/seoUtils';
 
 /**
  * Interface for favorite item from API
@@ -65,25 +66,19 @@ const Favorites: React.FC = () => {
   };
 
   // Create JSON-LD structured data for the page
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    'name': 'Your Favorite Cats | Cat Lovers App',
-    'description': 'A collection of cat images you\'ve saved as favorites.',
-    'url': window.location.href,
-    'mainEntity': {
-      '@type': 'ItemList',
-      'itemListElement': favorites ? favorites.slice(0, 10).map((favorite: FavoriteItem, index) => ({
-        '@type': 'ListItem',
-        'position': index + 1,
-        'url': `${window.location.origin}/favorites?imageId=${favorite.image_id}`,
-        'name': favorite.image.breeds && favorite.image.breeds.length > 0
-          ? `${favorite.image.breeds[0].name} Cat`
-          : 'Favorite Cat Image',
-        'image': favorite.image.url
-      })) : []
-    }
-  };
+  const jsonLd = createCollectionPageJsonLd({
+    title: 'Your Favorite Cats | Cat Lovers App',
+    description: 'A collection of cat images you\'ve saved as favorites.',
+    url: window.location.href,
+    items: favorites ? favorites.slice(0, 10).map((favorite: FavoriteItem, index) => ({
+      position: index + 1,
+      url: `${window.location.origin}/favorites?imageId=${favorite.image_id}`,
+      name: favorite.image.breeds && favorite.image.breeds.length > 0
+        ? `${favorite.image.breeds[0].name} Cat`
+        : 'Favorite Cat Image',
+      image: favorite.image.url
+    })) : []
+  });
 
   return (
     <div className="page-container">

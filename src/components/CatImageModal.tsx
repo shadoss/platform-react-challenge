@@ -1,9 +1,9 @@
 import React, { useState, useCallback, memo } from 'react';
 import { Modal, Button, Error, Loading } from './ui';
-import { addFavorite, removeFavorite, getFavorites } from '../api/catService';
 import type { CatImage as CatImageType } from '../types';
 import useFavoriteStore from '../store/favoriteStore';
 import { useQueryClient } from '@tanstack/react-query';
+import { addToFavorites, removeFromFavorites } from '../utils/favoriteUtils';
 
 interface CatImageModalProps {
   isOpen: boolean;
@@ -55,19 +55,8 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       setIsAddingFavorite(true);
       setActionError(null);
 
-      // Call the API to add to favorites
-      await addFavorite(image.id);
-
-      // Add to local store
-      addToStore({
-        id: image.id,
-        url: image.url,
-        breedId: breed?.id,
-        breedName: breed?.name,
-      });
-
-      // Invalidate the favorites query to ensure fresh data when navigating to Favorites page
-      await queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      // Use the utility function to add to favorites
+      await addToFavorites(image, addToStore, queryClient);
 
       setIsAddingFavorite(false);
     } catch (err) {
@@ -75,7 +64,7 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       setActionError('Failed to add to favorites. Please try again.');
       console.error('Error adding to favorites:', err);
     }
-  }, [image, breed, addToStore, queryClient, setIsAddingFavorite, setActionError]);
+  }, [image, addToStore, queryClient, setIsAddingFavorite, setActionError]);
 
   // Handle removing from favorites - memoized with useCallback
   const handleRemoveFavorite = useCallback(async () => {
@@ -85,27 +74,8 @@ const CatImageModal: React.FC<CatImageModalProps> = ({
       setIsRemovingFavorite(true);
       setActionError(null);
 
-      // If we have a favoriteId, call the API to remove from favorites
-      if (favoriteId !== undefined) {
-        await removeFavorite(favoriteId);
-      } else {
-        // If we don't have a favoriteId, we need to fetch it from the API
-        const favorites = await getFavorites();
-        const favorite = favorites.find(fav => fav.image_id === image.id);
-
-        if (favorite) {
-          // If we found the favorite, remove it from the API
-          await removeFavorite(favorite.id);
-        } else {
-          console.warn('Could not find favorite ID for image:', image.id);
-        }
-      }
-
-      // Remove from local store
-      removeFromStore(image.id);
-
-      // Invalidate the favorites query to ensure fresh data when navigating to Favorites page
-      await queryClient.invalidateQueries({ queryKey: ['favorites'] });
+      // Use the utility function to remove from favorites
+      await removeFromFavorites(image.id, favoriteId, removeFromStore, queryClient);
 
       setIsRemovingFavorite(false);
 

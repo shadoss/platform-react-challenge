@@ -6,6 +6,7 @@ import type { CatImage as CatImageType } from '../types';
 import { Button, Loading, Error, Card } from '../components/ui';
 import { CatImageModal, SEO } from '../components';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
+import { createCollectionPageJsonLd } from '../utils/seoUtils';
 
 /**
  * RandomCats page component
@@ -71,23 +72,17 @@ const RandomCats: React.FC = () => {
   };
 
   // Create JSON-LD structured data for the page
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    'name': 'Random Cats | Cat Lovers App',
-    'description': 'Discover adorable cat photos from our collection of random cat images.',
-    'url': window.location.href,
-    'mainEntity': {
-      '@type': 'ItemList',
-      'itemListElement': cats.slice(0, 10).map((cat, index) => ({
-        '@type': 'ListItem',
-        'position': index + 1,
-        'url': `${window.location.origin}/?imageId=${cat.id}`,
-        'name': cat.breeds && cat.breeds.length > 0 ? `${cat.breeds[0].name} Cat` : 'Cat Image',
-        'image': cat.url
-      }))
-    }
-  };
+  const jsonLd = createCollectionPageJsonLd({
+    title: 'Random Cats | Cat Lovers App',
+    description: 'Discover adorable cat photos from our collection of random cat images.',
+    url: window.location.href,
+    items: cats.slice(0, 10).map((cat, index) => ({
+      position: index + 1,
+      url: `${window.location.origin}/?imageId=${cat.id}`,
+      name: cat.breeds && cat.breeds.length > 0 ? `${cat.breeds[0].name} Cat` : 'Cat Image',
+      image: cat.url
+    }))
+  });
 
   return (
     <div className="page-container">

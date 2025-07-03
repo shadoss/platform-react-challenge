@@ -4,6 +4,7 @@ import { getBreeds } from '../api/catService';
 import type { CatBreed } from '../types';
 import { Loading, Error, Card, Button } from '../components/ui';
 import { BreedModal, SEO } from '../components';
+import { createCollectionPageJsonLd } from '../utils/seoUtils';
 
 /**
  * Breeds page component
@@ -35,26 +36,17 @@ const Breeds: React.FC = () => {
   };
 
   // Create JSON-LD structured data for the page
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    'name': 'Cat Breeds | Cat Lovers App',
-    'description': 'Explore different cat breeds and learn about their characteristics, origins, and temperaments.',
-    'url': window.location.href,
-    'mainEntity': {
-      '@type': 'ItemList',
-      'itemListElement': breeds ? breeds.slice(0, 10).map((breed, index) => ({
-        '@type': 'ListItem',
-        'position': index + 1,
-        'item': {
-          '@type': 'Thing',
-          'name': breed.name,
-          'description': breed.description,
-          'url': `${window.location.origin}/breeds?breed=${breed.id}`
-        }
-      })) : []
-    }
-  };
+  const jsonLd = createCollectionPageJsonLd({
+    title: 'Cat Breeds | Cat Lovers App',
+    description: 'Explore different cat breeds and learn about their characteristics, origins, and temperaments.',
+    url: window.location.href,
+    items: breeds ? breeds.slice(0, 10).map((breed, index) => ({
+      position: index + 1,
+      name: breed.name,
+      description: breed.description,
+      url: `${window.location.origin}/breeds?breed=${breed.id}`
+    })) : []
+  });
 
   return (
     <div className="page-container">
